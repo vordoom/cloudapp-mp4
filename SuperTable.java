@@ -38,7 +38,7 @@ public class SuperTable {
         admin.createTable(tableDescriptor);
 
         // Instantiating HTable class
-        HTable hTable = new HTable(config, "powers");
+        HTable hTable = new HTable(con, "powers");
 
         // Instantiating Put class
         Put p = new Put(Bytes.toBytes("row1"));
@@ -65,7 +65,7 @@ public class SuperTable {
         hTable.close();
 
         // Instantiate the Scan class
-        HTable table = new HTable(config, "powers");
+        HTable table = new HTable(con, "powers");
         Scan scan = new Scan();
 
         // Scan the required columns
