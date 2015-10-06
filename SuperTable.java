@@ -17,46 +17,68 @@ import org.apache.hadoop.hbase.client.Scan;
 
 import org.apache.hadoop.hbase.util.Bytes;
 
-public class SuperTable{
+public class SuperTable {
 
-   public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException {
 
-      // Instantiate Configuration class
+        // Instantiate Configuration class
+        Configuration con = HBaseConfiguration.create();
 
-      // Instaniate HBaseAdmin class
-      
-      // Instantiate table descriptor class
+        // Instaniate HBaseAdmin class
+        HBaseAdmin admin = new HBaseAdmin(con);
 
-      // Add column families to table descriptor
+        // Instantiate table descriptor class
+        HTableDescriptor tableDescriptor = new HTableDescriptor(TableName.valueOf("powers"));
 
-      // Execute the table through admin
+        // Add column families to table descriptor
+        tableDescriptor.addFamily(new HColumnDescriptor("personal"));
+        tableDescriptor.addFamily(new HColumnDescriptor("professional"));
 
-      // Instantiating HTable class
-     
-      // Repeat these steps as many times as necessary
+        // Execute the table through admin
+        admin.createTable(tableDescriptor);
 
-	      // Instantiating Put class
-              // Hint: Accepts a row name
+        // Instantiating HTable class
+        HTable hTable = new HTable(config, "powers");
 
-      	      // Add values using add() method
-              // Hints: Accepts column family name, qualifier/row name ,value
+        // Instantiating Put class
+        Put p = new Put(Bytes.toBytes("row1"));
+        p.add(Bytes.toBytes("personal"), Bytes.toBytes("hero"), Bytes.toBytes("superman"));
+        p.add(Bytes.toBytes("personal"), Bytes.toBytes("power"), Bytes.toBytes("strength"));
+        p.add(Bytes.toBytes("professional"), Bytes.toBytes("name"), Bytes.toBytes("clark"));
+        p.add(Bytes.toBytes("professional"), Bytes.toBytes("xp"), Bytes.toBytes("100"));
+        hTable.put(p);
 
-      // Save the table
-	
-      // Close table
+        p = new Put(Bytes.toBytes("row2"));
+        p.add(Bytes.toBytes("personal"), Bytes.toBytes("hero"), Bytes.toBytes("batman"));
+        p.add(Bytes.toBytes("personal"), Bytes.toBytes("power"), Bytes.toBytes("money"));
+        p.add(Bytes.toBytes("professional"), Bytes.toBytes("name"), Bytes.toBytes("bruce"));
+        p.add(Bytes.toBytes("professional"), Bytes.toBytes("xp"), Bytes.toBytes("50"));
+        hTable.put(p);
 
-      // Instantiate the Scan class
-     
-      // Scan the required columns
+        p = new Put(Bytes.toBytes("row3"));
+        p.add(Bytes.toBytes("personal"), Bytes.toBytes("hero"), Bytes.toBytes("wolverine"));
+        p.add(Bytes.toBytes("personal"), Bytes.toBytes("power"), Bytes.toBytes("healing"));
+        p.add(Bytes.toBytes("professional"), Bytes.toBytes("name"), Bytes.toBytes("logan"));
+        p.add(Bytes.toBytes("professional"), Bytes.toBytes("xp"), Bytes.toBytes("75"));
+        hTable.put(p);
 
-      // Get the scan result
+        hTable.close();
 
-      // Read values from scan result
-      // Print scan result
- 
-      // Close the scanner
-   
-      // Htable closer
-   }
+        // Instantiate the Scan class
+        HTable table = new HTable(config, "powers");
+        Scan scan = new Scan();
+
+        // Scan the required columns
+        scan.addColumn(Bytes.toBytes("personal"), Bytes.toBytes("hero"));
+
+        // Get the scan result
+        ResultScanner scanner = table.getScanner(scan);
+        for (Result result = scanner.next(); result != null; result = scanner.next()) {
+            System.out.println("Found	row	:	" + result);
+        }
+
+        scanner.close();
+        table.close();
+    }
 }
 
